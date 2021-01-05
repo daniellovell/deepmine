@@ -24,17 +24,15 @@ namespace DeepMineMod
             System.Random _mineableRandom = (System.Random)__instance.GetType().GetField("_mineableRandom", BindingFlags.NonPublic
                 | BindingFlags.Instance).GetValue(__instance);
             //UnityEngine.Debug.Log("Found _mineableRandom: " + _mineableRandom);
-            bool flag = chunks == null;
-            if (flag)
+            if (chunks == null)
             {
-
-                //m
+                // No chunks provided
                 var _chunksInfo = __instance.GetType().GetField("_chunks", BindingFlags.NonPublic | BindingFlags.Instance);
                 var _chunksVal = _chunksInfo.GetValue(__instance);
                 var _chunksType = _chunksInfo.FieldType;
                 var _chunksClearMethod = _chunksType.GetMethod("Clear");
 
-              //  UnityEngine.Debug.Log("Invoking _chunks.Clear(): " );
+                //  UnityEngine.Debug.Log("Invoking _chunks.Clear(): " );
                 _chunksClearMethod.Invoke(_chunksVal, new object[] { });
                 //UnityEngine.Debug.Log("Invoked _chunks.Clear()");
                 chunks = (HashSet < ChunkObject > )_chunksVal;
@@ -49,9 +47,9 @@ namespace DeepMineMod
             while (attempts < mineable.MaxVeinAttempts)
             {
                 attempts++;
-                bool flag2 = !VoxelGrid.IsPositionValid(grid, __instance.ChunkSize);
-                if (flag2)
+                if (!VoxelGrid.IsPositionValid(grid, __instance.ChunkSize))
                 {
+                    // If grid position is invalid on this chunk
                     Asteroid asteroid = __instance.ChunkController.GetChunk(__instance.LocalPosition + grid.ToVector3Raw()) as Asteroid;
                     bool flag3 = asteroid == null;
                     IReadOnlyCollection<ChunkObject> result;
