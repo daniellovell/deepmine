@@ -70,21 +70,12 @@ namespace DeepMineMod
                     if(searchCounter == 2)
                     {
                         yield return instructionList[i];
-                        Debug.Log(instructionList[i].opcode + " " + instructionList[i].operand);
                         yield return new CodeInstruction(OpCodes.Ldloc_S, lvi);
-                        Debug.Log(OpCodes.Ldloc_S + " " + lvi);
                         yield return new CodeInstruction(OpCodes.Ldarg_0);
-                        Debug.Log(OpCodes.Ldarg_0 + " ");
                         yield return new CodeInstruction(OpCodes.Ldfld, typeof(Asteroid).GetField("Position", BindingFlags.Public | BindingFlags.Instance));
-                        Debug.Log(OpCodes.Ldfld + " " + AccessTools.Field(typeof(Asteroid), "Position"));
                         yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Asteroid_SetMineable), "CalculateVeinSize"));
-                        Debug.Log(OpCodes.Call + " " + AccessTools.Method(typeof(Asteroid_SetMineable), "CalculateVeinSize"));
-
                         insertFlag = true;
                     }
-                    // Load V_0 (Grid3 world pos) onto the stack
-                    //if(startIndex + 1 >= instructionList.Count || startIndex < 0)
-                    //    throw new Exception("startIndex out of bounds in instructionlist count");
                 }
                 
                 if(insertFlag)
@@ -93,10 +84,7 @@ namespace DeepMineMod
                     insertFlag = false;
                 }
                 else
-                {
-                    Debug.Log(instructionList[i].opcode + " " + instructionList[i].operand);
                     yield return instructionList[i];
-                }
             }
         }
     }
