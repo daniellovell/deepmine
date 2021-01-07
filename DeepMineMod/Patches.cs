@@ -10,6 +10,8 @@ using UnityEngine;
 
 using Assets.Scripts.Objects.Items;
 using System.Reflection.Emit;
+using Assets.Scripts.GridSystem;
+using HarmonyLib.Tools;
 
 namespace DeepMineMod
 {
@@ -22,36 +24,80 @@ namespace DeepMineMod
          */
 
         static FieldInfo VeinSizeFieldInfo = AccessTools.Field(typeof(Mineables), "VeinSize");
-        static MethodInfo m_MyExtraMethod = SymbolExtensions.GetMethodInfo((Vector3 x) => CalculateVeinSize(x));
 
-        static float CalculateVeinSize(Vector3 localPos)
+        static float CalculateVeinSize(Grid3 worldGrid, Vector3 asteroidPosition)
         {
-            float veinSize = localPos.y * (-16.67f) + 166.67f;
-            veinSize = Math.Min(10, Math.Max(0, veinSize));
-            Debug.Log("Transpiler calculated " + veinSize);
-            return veinSize;
+            Vector3 worldPosition = worldGrid.ToVector3Raw() * ChunkObject.VoxelSize + asteroidPosition;
+            float veinSize = worldPosition.y * (-16.67f) + 166.67f;
+            Debug.Log("Vein Y Position: " + worldPosition.y);
+            veinSize = Math.Min(400, Math.Max(0, veinSize));
+            //Debug.Log("Transpiler calculated " + veinSize);
+            return 0;
         }
 
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var foundMassUsageMethod = false;
-
+            HarmonyFileLog.Enabled = true;
+            bool v0found = false;
             var instructionList = new List<CodeInstruction>(instructions);
-            
-            int startIndex;
-            for (int i = 0; i < instructionList.Count; i++)
+            LocalVariableInfo lvi = null;
+
+            int c = 0;
+            foreach(CodeInstruction ci in instructionList)
             {
-                if (instructionList[i].LoadsField(VeinSizeFieldInfo))
-                {
-                    startIndex = i - 1; // Back to nop@ IL012B
-                    // Load V_0 (Grid3 world pos) onto the stack
-                    instructionList[startIndex] = new CodeInstruction(OpCodes.Ldarg_1);
-                    instructionList[startIndex + 1] = new CodeInstruction(OpCodes.Call, m_MyExtraMethod);
-                    
-                }
+                FileLog.Log(c + ": " + ci.opcode + " " + ci.operand);
+                c++;
             }
 
-            return instructionList.AsEnumerable();
+            int searchCounter = 0; // When searchCounter == 3, we have found where to take write three instructions and skip two.
+            bool insertFlag = false;
+            for (int i = 0; i < instructionList.Count; i++)
+            {
+                if (!v0found && (instructionList[i].operand is LocalVariableInfo))
+                {
+                    LocalVariableInfo tmp = (LocalVariableInfo)instructionList[i].operand;
+                    if (tmp.LocalIndex == 0)
+                    {
+                        Debug.Log("V_0 LocalVariableInfo found!");
+                        lvi = tmp;
+                        v0found = true;
+                    }
+                }
+
+                if (instructionList[i].opcode == OpCodes.Ldc_R4)
+                {
+                    searchCounter++;
+                    if(searchCounter == 2)
+                    {
+                        yield return instructionList[i];
+                        Debug.Log(instructionList[i].opcode + " " + instructionList[i].operand);
+                        yield return new CodeInstruction(OpCodes.Ldloc_S, lvi);
+                        Debug.Log(OpCodes.Ldloc_S + " " + lvi);
+                        yield return new CodeInstruction(OpCodes.Ldarg_0);
+                        Debug.Log(OpCodes.Ldarg_0 + " ");
+                        yield return new CodeInstruction(OpCodes.Ldfld, typeof(Asteroid).GetField("Position", BindingFlags.Public | BindingFlags.Instance));
+                        Debug.Log(OpCodes.Ldfld + " " + AccessTools.Field(typeof(Asteroid), "Position"));
+                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Asteroid_SetMineable), "CalculateVeinSize"));
+                        Debug.Log(OpCodes.Call + " " + AccessTools.Method(typeof(Asteroid_SetMineable), "CalculateVeinSize"));
+
+                        insertFlag = true;
+                    }
+                    // Load V_0 (Grid3 world pos) onto the stack
+                    //if(startIndex + 1 >= instructionList.Count || startIndex < 0)
+                    //    throw new Exception("startIndex out of bounds in instructionlist count");
+                }
+                
+                if(insertFlag)
+                {
+                    i += 2;
+                    insertFlag = false;
+                }
+                else
+                {
+                    Debug.Log(instructionList[i].opcode + " " + instructionList[i].operand);
+                    yield return instructionList[i];
+                }
+            }
         }
     }
 

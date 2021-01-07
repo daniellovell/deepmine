@@ -4,6 +4,7 @@ using Assets.Scripts;
 using Assets.Scripts.Voxel;
 using Assets.Scripts.Objects;
 using HarmonyLib;
+using HarmonyLib.Tools;
 
 namespace DeepMineMod
 {
@@ -22,6 +23,8 @@ namespace DeepMineMod
 
             Log("Patching...");
             var harmony = new Harmony("com.dl.deepmine"); // rename "author" and "project"
+            HarmonyFileLog.Enabled = true;
+            Log(HarmonyFileLog.FileWriterPath);
             harmony.PatchAll();
             Log("Patched");
         }
