@@ -100,31 +100,31 @@ namespace DeepMineMod
         static void Postfix(Mineables __instance, Mineables masterInstance, Vector3 position, Asteroid parentAsteroid)
         {
 
-            if(position.y > 0)
+            if(position.y > -10)
             {
                 __instance.MinDropQuantity = 0;
-                __instance.MaxDropQuantity = 3;
+                __instance.MaxDropQuantity = 1;
             }
-            else if(position.y > -10)
+            else if(position.y > -30)
             {
                 __instance.MinDropQuantity = 2;
                 __instance.MaxDropQuantity = 7;
             }
 
-            else if (position.y > -30)
+            else if (position.y > -60)
             {
-                __instance.MinDropQuantity = 5;
+                __instance.MinDropQuantity = 10;
                 __instance.MaxDropQuantity = 20;
             }
-            else if (position.y > -60)
+            else if (position.y > -90)
             {
                 __instance.MinDropQuantity = 10;
                 __instance.MaxDropQuantity = 30;
             }
             else
             {
-                __instance.MinDropQuantity = 10;
-                __instance.MaxDropQuantity = 30;
+                __instance.MinDropQuantity = 20;
+                __instance.MaxDropQuantity = 40;
             }
             //Debug.Log("Position: " + position.y + "  new drop quantities: " + __instance.MinDropQuantity + " " + __instance.MaxDropQuantity);
             //__instance.VeinSize = 
@@ -154,16 +154,10 @@ namespace DeepMineMod
 
         static void Prefix(TerrainGeneration __instance)
         {
-            Debug.Log(WorldManager.SizeOfWorld);
-            Debug.Log(WorldManager.HalfSizeOfWorld);
-            Debug.Log(WorldManager.BedrockLevel);
-            Debug.Log(WorldManager.LavaLevel);
-
             WorldManager.SizeOfWorld = 80;
             WorldManager.HalfSizeOfWorld = 40;
             WorldManager.BedrockLevel = -160;
             WorldManager.LavaLevel = -160;
-            Debug.Log("Bedrock Level: " + WorldManager.BedrockLevel);
         }
     }
 
@@ -172,9 +166,7 @@ namespace DeepMineMod
     {
         static void Prefix(Asteroid __instance)
         {
-            bool setVoxelMax = __instance.LocalPosition.y + vector.y + WorldManager.OriginPositionLoading.y <= WorldManager.BedrockLevel + ChunkObject.VoxelHalfSize; 
             WorldManager.BedrockLevel = -160;
-            Debug.Log(WorldManager.BedrockLevel);
         }
     }
 
