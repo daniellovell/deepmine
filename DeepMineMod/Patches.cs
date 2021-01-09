@@ -18,6 +18,108 @@ using Assets.Scripts.Objects;
 namespace DeepMineMod
 {
 
+    /// <summary>
+    /// Alter ore drop quantities based on their world position
+    /// </summary>
+    [HarmonyPatch(typeof(Mineables), MethodType.Constructor, new Type[] { typeof(Mineables), typeof(Vector3), typeof(Asteroid)})]
+    public class Mineables_Constructor
+    {
+        static void Postfix(Mineables __instance, Mineables masterInstance, Vector3 position, Asteroid parentAsteroid)
+        {
+
+            if(position.y > -10)
+            {
+                __instance.MinDropQuantity = 0;
+                __instance.MaxDropQuantity = 1;
+            }
+            else if(position.y > -30)
+            {
+                __instance.MinDropQuantity = 2;
+                __instance.MaxDropQuantity = 7;
+            }
+
+            else if (position.y > -60)
+            {
+                __instance.MinDropQuantity = 10;
+                __instance.MaxDropQuantity = 20;
+            }
+            else if (position.y > -90)
+            {
+                __instance.MinDropQuantity = 10;
+                __instance.MaxDropQuantity = 30;
+            }
+            else
+            {
+                __instance.MinDropQuantity = 20;
+                __instance.MaxDropQuantity = 40;
+            }
+            //Debug.Log("Position: " + position.y + "  new drop quantities: " + __instance.MinDropQuantity + " " + __instance.MaxDropQuantity);
+            //__instance.VeinSize = 
+            //__instance.VeinSize = Math.Min(10, Math.Max(0, __instance.VeinSize));
+            //Debug.Log(__instance.Position + __instance.DisplayName);
+        }
+    }
+
+
+    [HarmonyPatch(typeof(CursorVoxel), MethodType.Constructor)]
+    public class CursorVoxel_Constructor
+    {
+        static void Postfix(CursorVoxel __instance)
+        {
+            Type typeBoxCollider = __instance.GameObject.GetComponent("BoxCollider").GetType();
+            PropertyInfo prop = typeBoxCollider.GetProperty("size");
+            //prop.SetValue(__instance.GameObject.GetComponent("BoxCollider"), new Vector3(5, 5, 5), null);
+        }
+    }
+
+    /// <summary>
+    /// Increase the bedrock level
+    /// </summary>
+    [HarmonyPatch(typeof(TerrainGeneration), "BuildAsteroidsStream", new Type[] { typeof(Vector3), typeof(int), typeof(int) })]
+    public class WorldManager_SetWorldEnvironments
+    {
+        static FieldInfo SizeOfWorld = AccessTools.Field(typeof(WorldManager), "SizeOfWorld");
+        static FieldInfo HalfSizeOfWorld = AccessTools.Field(typeof(WorldManager), "HalfSizeOfWorld");
+        static FieldInfo BedrockLevel = AccessTools.Field(typeof(WorldManager), "BedrockLevel");
+
+        static void Prefix(TerrainGeneration __instance)
+        {
+            WorldManager.SizeOfWorld = 80;
+            WorldManager.HalfSizeOfWorld = 40;
+            WorldManager.BedrockLevel = -160;
+            WorldManager.LavaLevel = -160;
+        }
+    }
+
+    /// <summary>
+    /// Enforcing new bedrock level during the world creation process
+    /// </summary>
+    [HarmonyPatch(typeof(Asteroid), "GenerateChunk", new Type[] { typeof(IReadOnlyCollection<Vector4>), typeof(uint), typeof(bool) })]
+    public class Asteroid_GenerateChunk
+    {
+        static void Prefix(Asteroid __instance)
+        {
+            WorldManager.BedrockLevel = -160;
+        }
+    }
+
+    /// <summary>
+    /// Increasing drill speed
+    /// </summary>
+    [HarmonyPatch(typeof(MiningDrill), "Awake")]
+    public class MiningDrill_Awake
+    {
+        static void Prefix(MiningDrill __instance)
+        {
+            __instance.MineCompletionTime = 0.05f;
+            __instance.MineAmount = 0.5f;
+        }
+    }
+
+    // WIP for altering ore generation in the SetMineable function
+    // VeinSize does not help really, its 0-1 and 1 is the maximum ore size
+    // Best to alter VeinAttempts at lower locations
+
     /*
     [HarmonyPatch(typeof(Asteroid), "SetMineable", new Type[] { typeof(Vector4), typeof(Mineables), typeof(HashSet < ChunkObject >), typeof(int)})]
     public class Asteroid_SetMineable
@@ -93,93 +195,5 @@ namespace DeepMineMod
     }
     */
 
-
-    [HarmonyPatch(typeof(Mineables), MethodType.Constructor, new Type[] { typeof(Mineables), typeof(Vector3), typeof(Asteroid)})]
-    public class Mineables_Constructor
-    {
-        static void Postfix(Mineables __instance, Mineables masterInstance, Vector3 position, Asteroid parentAsteroid)
-        {
-
-            if(position.y > -10)
-            {
-                __instance.MinDropQuantity = 0;
-                __instance.MaxDropQuantity = 1;
-            }
-            else if(position.y > -30)
-            {
-                __instance.MinDropQuantity = 2;
-                __instance.MaxDropQuantity = 7;
-            }
-
-            else if (position.y > -60)
-            {
-                __instance.MinDropQuantity = 10;
-                __instance.MaxDropQuantity = 20;
-            }
-            else if (position.y > -90)
-            {
-                __instance.MinDropQuantity = 10;
-                __instance.MaxDropQuantity = 30;
-            }
-            else
-            {
-                __instance.MinDropQuantity = 20;
-                __instance.MaxDropQuantity = 40;
-            }
-            //Debug.Log("Position: " + position.y + "  new drop quantities: " + __instance.MinDropQuantity + " " + __instance.MaxDropQuantity);
-            //__instance.VeinSize = 
-            //__instance.VeinSize = Math.Min(10, Math.Max(0, __instance.VeinSize));
-            //Debug.Log(__instance.Position + __instance.DisplayName);
-        }
-    }
-
-
-    [HarmonyPatch(typeof(CursorVoxel), MethodType.Constructor)]
-    public class CursorVoxel_Constructor
-    {
-        static void Postfix(CursorVoxel __instance)
-        {
-            Type typeBoxCollider = __instance.GameObject.GetComponent("BoxCollider").GetType();
-            PropertyInfo prop = typeBoxCollider.GetProperty("size");
-            //prop.SetValue(__instance.GameObject.GetComponent("BoxCollider"), new Vector3(5, 5, 5), null);
-        }
-    }
-
-    [HarmonyPatch(typeof(TerrainGeneration), "BuildAsteroidsStream", new Type[] { typeof(Vector3), typeof(int), typeof(int) })]
-    public class WorldManager_SetWorldEnvironments
-    {
-        static FieldInfo SizeOfWorld = AccessTools.Field(typeof(WorldManager), "SizeOfWorld");
-        static FieldInfo HalfSizeOfWorld = AccessTools.Field(typeof(WorldManager), "HalfSizeOfWorld");
-        static FieldInfo BedrockLevel = AccessTools.Field(typeof(WorldManager), "BedrockLevel");
-
-        static void Prefix(TerrainGeneration __instance)
-        {
-            WorldManager.SizeOfWorld = 80;
-            WorldManager.HalfSizeOfWorld = 40;
-            WorldManager.BedrockLevel = -160;
-            WorldManager.LavaLevel = -160;
-        }
-    }
-
-    [HarmonyPatch(typeof(Asteroid), "GenerateChunk", new Type[] { typeof(IReadOnlyCollection<Vector4>), typeof(uint), typeof(bool) })]
-    public class Asteroid_GenerateChunk
-    {
-        static void Prefix(Asteroid __instance)
-        {
-            WorldManager.BedrockLevel = -160;
-        }
-    }
-
-    [HarmonyPatch(typeof(MiningDrill), "Awake")]
-    public class MiningDrill_Awake
-    {
-        static void Prefix(MiningDrill __instance)
-        {
-            __instance.MineCompletionTime = 0.05f;
-            __instance.MineAmount = 0.5f;
-        }
-    }
-
-    //[HarmonyPatch(typeof(TestClass), MethodType.Constructor, new Type[] { typeof(int) })]
 
 }

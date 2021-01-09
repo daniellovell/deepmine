@@ -8,25 +8,23 @@ using HarmonyLib.Tools;
 
 namespace DeepMineMod
 {
-    [BepInPlugin("org.bepinex.plugins.deepmine", "Deep Mine Mod", "1.0.0.0")]
+    [BepInPlugin("org.bepinex.plugins.deepmine", "Deep Mine Mod", "0.1.0.0")]
     public class DeepMinePlugin : BaseUnityPlugin
     {
-
-        void Log(string text)
+        public static void ModLog(string text)
         {
             UnityEngine.Debug.Log("[Deep Mine Mod] " + text);
         }
+
         // Awake is called once when both the game and the plug-in are loaded
         void Awake()
         {
-            Log("Successfully loaded Deep Mine Mod");
+            ModLog("Successfully loaded Deep Mine Mod");
 
-            Log("Patching...");
-            var harmony = new Harmony("com.dl.deepmine"); // rename "author" and "project"
-            HarmonyFileLog.Enabled = true;
-            Log(HarmonyFileLog.FileWriterPath);
+            ModLog("Patching...");
+            var harmony = new Harmony("com.dl.deepmine");
             harmony.PatchAll();
-            Log("Patched");
+            ModLog("Patched");
         }
 
     }
