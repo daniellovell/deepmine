@@ -61,6 +61,9 @@ namespace DeepMineMod
     }
 
 
+    /// <summary>
+    /// Placeholder for larger mining tools
+    /// </summary>
     [HarmonyPatch(typeof(CursorVoxel), MethodType.Constructor)]
     public class CursorVoxel_Constructor
     {
@@ -84,10 +87,10 @@ namespace DeepMineMod
 
         static void Prefix(TerrainGeneration __instance)
         {
-            WorldManager.SizeOfWorld = 80;
-            WorldManager.HalfSizeOfWorld = 40;
-            WorldManager.BedrockLevel = -160;
-            WorldManager.LavaLevel = -160;
+            WorldManager.BedrockLevel = DeepMinePlugin.BedrockDepth;
+            WorldManager.SizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 2;
+            WorldManager.HalfSizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 4;
+            WorldManager.LavaLevel = DeepMinePlugin.BedrockDepth;
         }
     }
 
@@ -99,7 +102,7 @@ namespace DeepMineMod
     {
         static void Prefix(Asteroid __instance)
         {
-            WorldManager.BedrockLevel = -160;
+            WorldManager.BedrockLevel = DeepMinePlugin.BedrockDepth;
         }
     }
 
