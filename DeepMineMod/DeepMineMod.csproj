@@ -3,6 +3,7 @@
   
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Configurations>Debug;Release;Debug-Deploy</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,5 +26,9 @@
       <HintPath>Libs\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y /F &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Stationeers\BepInEx\plugins&quot;" />
+  </Target>
 
 </Project>
