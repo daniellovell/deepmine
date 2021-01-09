@@ -1,5 +1,7 @@
 # deepmine
 
+![image](https://user-images.githubusercontent.com/6250953/104089769-5b5d2d00-5226-11eb-9b6e-2ce87961ffb0.png)
+
 The goal of the mod is to enhance sub-surface gameplay and make it worthwhile to build structures and explore deep below the surface. Personally I find the surface (placer) mining mechanic of the game to be the weakest gameplay loop in an otherwise amazing game. I'm striving to make mining in Stationeers a more enjoyable experience :-)
 
 I want to emphasize this mod is very very raw. An alpha version of sorts. I'm hoping to get some feedback from the community on balancing and requested features!
