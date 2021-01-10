@@ -14,6 +14,7 @@ using System.Reflection.Emit;
 using Assets.Scripts.GridSystem;
 using HarmonyLib.Tools;
 using Assets.Scripts.Objects;
+using Assets.Scripts.Objects.Electrical;
 
 namespace DeepMineMod
 {
@@ -116,6 +117,27 @@ namespace DeepMineMod
         {
             __instance.MineCompletionTime = 0.05f;
             __instance.MineAmount = 0.5f;
+        }
+    }
+
+    /// <summary>
+    /// Hooks the Quarry (Auto Miner) OnRegistered event for modification in the future
+    /// e.g. altering the quarry direction to horizontal rather than vertica
+    /// </summary>
+    [HarmonyPatch(typeof(Quarry), "OnRegistered", new Type[] { typeof(Cell) })]
+    public class Quarry_OnRegistered
+    {
+
+        static void Prefix(Quarry __instance)
+        {
+            FieldInfo QuarryArea = AccessTools.Field(typeof(Quarry), "QuarryArea");
+            Type typeBoxCollider = QuarryArea.GetType();
+            PropertyInfo prop = typeBoxCollider.GetProperty("size");
+            if(QuarryArea.GetValue(__instance) != null)
+            {
+                Vector3 s = (Vector3)prop.GetValue(QuarryArea.GetValue(__instance));
+                DeepMinePlugin.ModLog(s.ToString());
+            }
         }
     }
 
