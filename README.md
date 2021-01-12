@@ -9,10 +9,11 @@ I want to emphasize this mod is very very raw. An alpha version of sorts. I'm ho
 ### Features
 
 Completed features
- - :heavy_check_mark: Lowered bedrock depth (currently 4x deeper)
+ - :heavy_check_mark: Lowered bedrock depth - default 4x deeper than vanilla (configurable)
  - :heavy_check_mark: No more lava/bedrock texture at unrealistic depths
  - :heavy_check_mark: Increasing ore yields the deeper you go
  - :heavy_check_mark: Faster drilling speeds
+ - :heavy_check_mark: Doubled GPR (ground penetrating radar) scan radius (configurable)
 
 Planned features
  - :small_orange_diamond: Increasing vein size/frequency at deeper depths (conversely, sparse veins at the surface)
@@ -26,11 +27,14 @@ Planned features
 
 #### With other mods
  - Not sure about this one, but I'd be hesitant to run this mod with any other terrain generation/ore rebalancing mods.
-
+ 
 ### Installation
 
- - Requires an installation of BepInEx
- - Once BepInEx is installed (a la pasting in the Stationeers root directory and running the game once), place the provided .dll in the BepInEx\plugins folder
+ 1. Install BepInEx to your Stationeers folder in Program Files (x86) https://github.com/BepInEx/BepInEx/releases
+ 2. Run Stationeers once to complete the BepInEx installation
+ 3. Install ``DeepMineMod.dll`` to the Stationeers/BepInEx/plugins folder
+ 4. Run Stationeers once to generate the config file
+ 5. Change the config to your liking in /Stationeers/BepInEx/config/com.dl.deepmine.cfg
 
 ### Contributions
 
