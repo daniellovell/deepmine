@@ -76,8 +76,11 @@ namespace DeepMineMod
         }
     }
 
+    /// <summary>
+    /// Prevents lava bedrock texture from spawning
+    /// </summary>
     [HarmonyPatch(typeof(TerrainGeneration), "SetUpChunk", new Type[] { typeof(ChunkObject) })]
-    public class TerrainGeneartion_SetUpChunk
+    public class TerrainGeneration_SetUpChunk
     {
         static void Postfix(TerrainGeneration __instance, ref ChunkObject chunk)
         {
@@ -98,8 +101,8 @@ namespace DeepMineMod
         static void Prefix(TerrainGeneration __instance)
         {
             WorldManager.BedrockLevel = DeepMinePlugin.BedrockDepth;
-            WorldManager.SizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 2;
-            WorldManager.HalfSizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 4;
+            //WorldManager.SizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 2;
+            //WorldManager.HalfSizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 4;
             WorldManager.LavaLevel = DeepMinePlugin.BedrockDepth;
         }
     }
@@ -126,6 +129,18 @@ namespace DeepMineMod
         {
             __instance.MineCompletionTime = 0.05f;
             __instance.MineAmount = 0.5f;
+        }
+    }
+
+    /// <summary>
+    /// Increasing drill speed
+    /// </summary>
+    [HarmonyPatch(typeof(PortableGPR), "Awake")]
+    public class PortableGPR_Awake
+    {
+        static void Prefix(PortableGPR __instance)
+        {
+            __instance.Resolution = 40;
         }
     }
 
