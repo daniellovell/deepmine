@@ -76,6 +76,15 @@ namespace DeepMineMod
         }
     }
 
+    [HarmonyPatch(typeof(TerrainGeneration), "SetUpChunk", new Type[] { typeof(ChunkObject) })]
+    public class TerrainGeneartion_SetUpChunk
+    {
+        static void Postfix(TerrainGeneration __instance, ref ChunkObject chunk)
+        {
+            chunk.MeshRenderer.sharedMaterial.SetVector("_WorldOrigin", WorldManager.OriginPositionLoading + new Vector3(0, 150, 0));
+        }
+    }
+
     /// <summary>
     /// Increase the bedrock level
     /// </summary>
