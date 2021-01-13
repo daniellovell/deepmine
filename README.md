@@ -1,5 +1,5 @@
 # deepmine
-[![GitHub Release](https://img.shields.io/github/v/release/daniellovell/deepmine?style=flat-square)]() [![Commits Since](https://img.shields.io/github/commits-since/daniellovell/deepmine/latest?color=yellow&style=flat-square)]() [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![Discord](https://img.shields.io/discord/799012229524488223?color=blue&label=Discord&logo=Discord&style=flat-square)]() [![GitHub Release](https://img.shields.io/github/v/release/daniellovell/deepmine?style=flat-square)]() [![Commits Since](https://img.shields.io/github/commits-since/daniellovell/deepmine/latest?color=yellow&style=flat-square)]() [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
 ![image](https://user-images.githubusercontent.com/6250953/104089769-5b5d2d00-5226-11eb-9b6e-2ce87961ffb0.png)
 
