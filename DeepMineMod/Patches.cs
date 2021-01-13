@@ -140,7 +140,7 @@ namespace DeepMineMod
     {
         static void Prefix(PortableGPR __instance)
         {
-            __instance.Resolution = 40;
+            __instance.Resolution = DeepMinePlugin.GPRRange;
         }
     }
 
