@@ -1,5 +1,5 @@
 # deepmine
-[![Discord](https://img.shields.io/discord/799012229524488223?color=blue&label=Discord&logo=Discord&style=flat-square)]() [![GitHub Release](https://img.shields.io/github/v/release/daniellovell/deepmine?style=flat-square)]() [![Commits Since](https://img.shields.io/github/commits-since/daniellovell/deepmine/latest?color=yellow&style=flat-square)]() [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
+[![Discord](https://img.shields.io/discord/799012229524488223?color=blue&label=Discord&logo=Discord&style=flat-square)](https://discord.gg/PAcMZfPH) [![GitHub Release](https://img.shields.io/github/v/release/daniellovell/deepmine?style=flat-square)](https://github.com/daniellovell/deepmine/releases/latest) [![Commits Since](https://img.shields.io/github/commits-since/daniellovell/deepmine/latest?color=yellow&style=flat-square)](https://github.com/daniellovell/deepmine/commits/main) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 
 ![image](https://user-images.githubusercontent.com/6250953/104089769-5b5d2d00-5226-11eb-9b6e-2ce87961ffb0.png)
 
@@ -31,6 +31,7 @@ Planned features
  
 ### Installation
 
+ 0. Download the latest release of Deep Mine https://github.com/daniellovell/deepmine/releases/latest
  1. Install BepInEx to your Stationeers folder in Program Files (x86) https://github.com/BepInEx/BepInEx/releases
  2. Run Stationeers once to complete the BepInEx installation
  3. Install ``DeepMineMod.dll`` to the Stationeers/BepInEx/plugins folder
