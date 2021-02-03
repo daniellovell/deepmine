@@ -61,6 +61,17 @@ namespace DeepMineMod
         }
     }
 
+    /// <summary>
+    /// Alter ore drop quantities based on their world position
+    /// </summary>
+    [HarmonyPatch(typeof(Ore), "Start")]
+    public class Ore_Start
+    {
+        static void Postfix(Ore __instance)
+        {
+            __instance.MaxQuantity = 100;
+        }
+    }
 
     /// <summary>
     /// Placeholder for larger mining tools
