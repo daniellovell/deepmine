@@ -4,7 +4,7 @@ using BepInEx.Configuration;
 
 namespace DeepMineMod
 {
-    [BepInPlugin("com.dl.deepmine", "Deep Mine Mod", "0.1.0.0")]
+    [BepInPlugin("com.dl.deepmine", "Deep Mine Mod", "0.2.1.0")]
     public class DeepMinePlugin : BaseUnityPlugin
     {
         private ConfigEntry<float> configBedrockDepth;
