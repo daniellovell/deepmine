@@ -154,6 +154,7 @@ namespace DeepMineMod
 
         static void Prefix(Quarry __instance)
         {
+            /*
             FieldInfo QuarryArea = AccessTools.Field(typeof(Quarry), "QuarryArea");
             Type typeBoxCollider = QuarryArea.GetType();
             PropertyInfo prop = typeBoxCollider.GetProperty("size");
@@ -162,6 +163,7 @@ namespace DeepMineMod
                 Vector3 s = (Vector3)prop.GetValue(QuarryArea.GetValue(__instance));
                 DeepMinePlugin.ModLog(s.ToString());
             }
+            */
         }
     }
 
