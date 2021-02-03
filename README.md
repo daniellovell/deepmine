@@ -15,16 +15,18 @@ Completed features
  - :heavy_check_mark: Increasing ore yields the deeper you go
  - :heavy_check_mark: Faster drilling speeds
  - :heavy_check_mark: Doubled GPR (ground penetrating radar) scan radius (configurable)
+ - :heavy_check_mark: Increased ore stack size to 100
 
 Planned features
  - :small_orange_diamond: Increasing vein size/frequency at deeper depths (conversely, sparse veins at the surface)
+ - :small_orange_diamond: Horizontal auto miner drilling
  - :small_orange_diamond: More mining drill tiers. Including tools with larger mining radius.
  - :small_orange_diamond: Threats and dangers below the surface. Gas pockets, and various pressure/temperature
 
 ### Compatibility
 
 #### With existing saves
- - As of version 0.1, this mod is compatible with existing saves and will not corrupt them when you install or uninstall the mod
+ - As of version v0.1.0, this mod is compatible with existing saves and will not corrupt them when you install the mod. When uninstalling the mod, note that any items/structures below the bedrock depth will be deleted by Stationeers.
 
 #### With other mods
  - Not sure about this one, but I'd be hesitant to run this mod with any other terrain generation/ore rebalancing mods.
