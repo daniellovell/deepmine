@@ -69,7 +69,7 @@ namespace DeepMineMod
     {
         static void Postfix(Ore __instance)
         {
-            __instance.MaxQuantity = 100;
+            __instance.MaxQuantity = DeepMinePlugin.OreStackSize;
         }
     }
 

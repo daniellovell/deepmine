@@ -4,14 +4,16 @@ using BepInEx.Configuration;
 
 namespace DeepMineMod
 {
-    [BepInPlugin("com.dl.deepmine", "Deep Mine Mod", "0.2.1.0")]
+    [BepInPlugin("com.dl.deepmine", "Deep Mine Mod", "0.2.2.0")]
     public class DeepMinePlugin : BaseUnityPlugin
     {
         private ConfigEntry<float> configBedrockDepth;
         private ConfigEntry<int> configGPRRange;
+        private ConfigEntry<int> configOreStackSize;
 
         public static float BedrockDepth;
         public static int GPRRange;
+        public static int OreStackSize;
 
         public static void ModLog(string text)
         {
@@ -45,6 +47,13 @@ namespace DeepMineMod
                                      "The range of the portable ground penetrating radar (GPR), vanilla is 20 "); // Description of the option to show in the config file
 
             GPRRange = configGPRRange.Value;
+
+            configOreStackSize = Config.Bind("General",   // The section under which the option is shown
+                                     "OreStackSize",  // The key of the configuration option in the configuration file
+                                     100, // The default value
+                                     "The maximum amount of ore to be stacked in the inventory, vanilla is 50"); // Description of the option to show in the config file
+
+            OreStackSize = configOreStackSize.Value;
         }
 
     }
