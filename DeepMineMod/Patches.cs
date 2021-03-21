@@ -138,8 +138,8 @@ namespace DeepMineMod
     {
         static void Prefix(MiningDrill __instance)
         {
-            __instance.MineCompletionTime = 0.05f;
-            __instance.MineAmount = 0.5f;
+            __instance.MineCompletionTime = DeepMinePlugin.MineCompletionTime;
+            __instance.MineAmount = DeepMinePlugin.MineAmount;
         }
     }
 

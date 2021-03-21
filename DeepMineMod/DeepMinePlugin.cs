@@ -10,10 +10,14 @@ namespace DeepMineMod
         private ConfigEntry<float> configBedrockDepth;
         private ConfigEntry<int> configGPRRange;
         private ConfigEntry<int> configOreStackSize;
+        private ConfigEntry<float> configMineCompletionTime;
+        private ConfigEntry<float> configMineAmount;
 
         public static float BedrockDepth;
         public static int GPRRange;
         public static int OreStackSize;
+        public static float MineCompletionTime;
+        public static float MineAmount;
 
         public static void ModLog(string text)
         {
@@ -54,6 +58,21 @@ namespace DeepMineMod
                                      "The maximum amount of ore to be stacked in the inventory, vanilla is 50"); // Description of the option to show in the config file
 
             OreStackSize = configOreStackSize.Value;
+
+
+            configMineCompletionTime = Config.Bind("Mining Tool",   // The section under which the option is shown
+                                     "MineCompletionTime",  // The key of the configuration option in the configuration file
+                                     0.05f, // The default value
+                                     "Time to complete mining when using the tool. Smaller is faster drilling. Vanilla is 0.12"); // Description of the option to show in the config file
+
+            MineCompletionTime = configMineCompletionTime.Value;
+
+            configMineAmount = Config.Bind("Mining Tool",   // The section under which the option is shown 
+                         "MineAmount",  // The key of the configuration option in the configuration file
+                         0.5f, // The default value
+                         "How much of the voxel to mine at a time. Larger is faster drilling. Vanilla is 0.2"); // Description of the option to show in the config file
+
+            MineAmount = configMineAmount.Value;
         }
 
     }
