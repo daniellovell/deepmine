@@ -1,65 +1,16 @@
-﻿using System;
-using System.Linq;
-using Assets.Scripts;
+﻿using Assets.Scripts;
+using Assets.Scripts.GridSystem;
+using Assets.Scripts.Objects.Electrical;
+using Assets.Scripts.Objects.Items;
+using Assets.Scripts.Util;
 using Assets.Scripts.Voxel;
 using HarmonyLib;
-
-using System.Reflection;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
-using UnityEngine.Networking;
-
-using Assets.Scripts.Objects.Items;
-using System.Reflection.Emit;
-using Assets.Scripts.GridSystem;
-using HarmonyLib.Tools;
-using Assets.Scripts.Objects;
-using Assets.Scripts.Objects.Electrical;
-
 namespace DeepMineMod
 {
-
-    /// <summary>
-    /// Alter ore drop quantities based on their world position
-    /// </summary>
-    [HarmonyPatch(typeof(Mineables), MethodType.Constructor, new Type[] { typeof(Mineables), typeof(Vector3), typeof(Asteroid)})]
-    public class Mineables_Constructor
-    {
-        static void Postfix(Mineables __instance, Mineables masterInstance, Vector3 position, Asteroid parentAsteroid)
-        {
-
-            if(position.y > -10)
-            {
-                __instance.MinDropQuantity = 0;
-                __instance.MaxDropQuantity = 1;
-            }
-            else if(position.y > -30)
-            {
-                __instance.MinDropQuantity = 2;
-                __instance.MaxDropQuantity = 7;
-            }
-
-            else if (position.y > -60)
-            {
-                __instance.MinDropQuantity = 10;
-                __instance.MaxDropQuantity = 20;
-            }
-            else if (position.y > -90)
-            {
-                __instance.MinDropQuantity = 10;
-                __instance.MaxDropQuantity = 30;
-            }
-            else
-            {
-                __instance.MinDropQuantity = 20;
-                __instance.MaxDropQuantity = 40;
-            }
-            //Debug.Log("Position: " + position.y + "  new drop quantities: " + __instance.MinDropQuantity + " " + __instance.MaxDropQuantity);
-            //__instance.VeinSize = 
-            //__instance.VeinSize = Math.Min(10, Math.Max(0, __instance.VeinSize));
-            //Debug.Log(__instance.Position + __instance.DisplayName);
-        }
-    }
 
     /// <summary>
     /// Alter ore drop quantities based on their world position
@@ -182,80 +133,106 @@ namespace DeepMineMod
     // VeinSize does not help really, its 0-1 and 1 is the maximum ore size
     // Best to alter VeinAttempts at lower locations
 
-    /*
-    [HarmonyPatch(typeof(Asteroid), "SetMineable", new Type[] { typeof(Vector4), typeof(Mineables), typeof(HashSet < ChunkObject >), typeof(int)})]
-    public class Asteroid_SetMineable
+
+    [HarmonyPatch(typeof(Asteroid), "SetMineable", new Type[] { typeof(Vector4), typeof(Mineables), typeof(HashSet<ChunkObject>), typeof(int) })]
+    public static class Asteroid_SetMineable
     {
-        /**
-        // Patch the Asteroid::SetMineable function (placing mineables on an asteroid, aka chunk)
-        ///
-
-        static FieldInfo VeinSizeFieldInfo = AccessTools.Field(typeof(Mineables), "VeinSize");
-
-        static float CalculateVeinSize(Grid3 worldGrid, Vector3 asteroidPosition)
+        public static float Lerp(float a, float b, float t)
         {
-            Vector3 worldPosition = worldGrid.ToVector3Raw() * ChunkObject.VoxelSize + asteroidPosition;
-            float veinSize = worldPosition.y * (-16.67f) + 166.67f;
-            //Debug.Log("Vein Y Position: " + worldPosition.y);
-            veinSize = Math.Min(400, Math.Max(0, veinSize));
-            Debug.Log("Position: " + worldPosition + "  VeinSize: " + veinSize);
-            return veinSize;
+            return t * b + (1 - t) * a;
+        }
+        static (int, int) CalculateMaxVeinAttempts(Mineables mineable, Grid3 worldGrid, Vector3 asteroidPosition)
+        {            
+           Vector3 worldPosition = worldGrid.ToVector3Raw() * ChunkObject.VoxelSize + asteroidPosition;
+            var distanceFromSpawn = Vector3.Distance(worldPosition, new Vector3(0f, worldPosition.y, 0f));
+            float depth = 0f - worldPosition.y;
+            depth = depth > 0f ? depth : 0f;
+            float depthWeight = 1f;
+            float distanceWeight = 0.1f;
+            float multiplier = 1f + (Lerp(0f, 0.05f, depth) * depthWeight) + (Lerp(0f, 0.001f, distanceFromSpawn) * distanceWeight);
+            Debug.Log($"Pos: {worldPosition}, Depth: {depth}, Dist: {distanceFromSpawn}, mult: {multiplier}");
+            int min = (int)Math.Ceiling(mineable.MinVeinAttempts * multiplier);
+            int max = (int)Math.Ceiling(mineable.MaxVeinAttempts * multiplier);
+            return (min, max);
         }
 
-        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        public static bool Prefix(Asteroid __instance, Vector4 localPosition, ref IReadOnlyCollection<ChunkObject> __result,  Mineables mineable = null, HashSet<ChunkObject> chunks = null, int attempts = 0)
         {
-            HarmonyFileLog.Enabled = true;
-            bool v0found = false;
-            var instructionList = new List<CodeInstruction>(instructions);
-            LocalVariableInfo lvi = null;
-
-            int c = 0;
-            foreach(CodeInstruction ci in instructionList)
+            bool flag = chunks == null;
+            if (flag)
             {
-                FileLog.Log(c + ": " + ci.opcode + " " + ci.operand);
-                c++;
+                __instance._chunks.Clear();
+                chunks = __instance._chunks;
             }
-
-            int searchCounter = 0; // When searchCounter == 3, we have found where to take write three instructions and skip two.
-            bool insertFlag = false;
-            for (int i = 0; i < instructionList.Count; i++)
+            Grid3 grid = ((Vector3)localPosition).ToGridRaw();
+            mineable = (mineable ?? MiningManager.GenerateRandomMineableType(__instance._mineableRandom));
+            var (minVeinAttempts, maxVeinAttempts) = CalculateMaxVeinAttempts(mineable, grid, __instance.Position);
+            while (attempts < maxVeinAttempts)
             {
-                if (!v0found && (instructionList[i].operand is LocalVariableInfo))
+                attempts++;
+                bool flag2 = !VoxelGrid.IsPositionValid(grid, __instance.ChunkSize);
+                if (flag2)
                 {
-                    LocalVariableInfo tmp = (LocalVariableInfo)instructionList[i].operand;
-                    if (tmp.LocalIndex == 0)
+                    Asteroid asteroid = __instance.ChunkController.GetChunk(__instance.LocalPosition + grid.ToVector3Raw()) as Asteroid;
+                    bool flag3 = asteroid == null;
+                    IReadOnlyCollection<ChunkObject> result;
+                    if (flag3)
                     {
-                        Debug.Log("V_0 LocalVariableInfo found!");
-                        lvi = tmp;
-                        v0found = true;
+                        result = chunks;
                     }
-                }
-
-                if (instructionList[i].opcode == OpCodes.Ldc_R4)
-                {
-                    searchCounter++;
-                    if(searchCounter == 2)
+                    else
                     {
-                        yield return instructionList[i];
-                        yield return new CodeInstruction(OpCodes.Ldloc_S, lvi);
-                        yield return new CodeInstruction(OpCodes.Ldarg_0);
-                        yield return new CodeInstruction(OpCodes.Ldfld, typeof(Asteroid).GetField("Position", BindingFlags.Public | BindingFlags.Instance));
-                        yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Asteroid_SetMineable), "CalculateVeinSize"));
-                        insertFlag = true;
+                        grid.ModuloCorrect(__instance.ChunkSize);
+                        asteroid.SetMineable(new Vector4((float)grid.x, (float)grid.y, (float)grid.z, localPosition.w), mineable, chunks, attempts);
+                        result = chunks;
                     }
+                    __result = result;
+                    return false;
                 }
-                
-                if(insertFlag)
+                chunks.Add(__instance);
+                __instance.SetVoxel((byte)mineable.VoxelType, 1f, (short)grid.x, (short)grid.y, (short)grid.z, true);
+                __instance.PopulateMineable(grid.ToVector3Raw(), mineable.VoxelType);
+                bool flag4 = __instance._mineableRandom.NextDouble() >= (double)(1f - mineable.VeinSize);
+                if (flag4)
                 {
-                    i += 2;
-                    insertFlag = false;
+                    while (attempts < maxVeinAttempts)
+                    {
+                        Grid3 grid2;
+                        do
+                        {
+                            grid2.x = __instance._mineableRandom.Next(-1, 2);
+                            grid2.y = __instance._mineableRandom.Next(-1, 2);
+                            grid2.z = __instance._mineableRandom.Next(-1, 2);
+                        }
+                        while (grid2.x == 0 && grid2.y == 0 && grid2.z == 0);
+                        Grid3 grid3 = grid + grid2;
+                        Vector3 worldPosition = __instance.LocalPosition + grid3.ToVector3Raw();
+                        ChunkObject chunk = ChunkController.World.GetChunk(worldPosition);
+                        bool flag5 = chunk != null;
+                        if (flag5)
+                        {
+                            Voxel voxelWorld = __instance.ChunkController.GetVoxelWorld(worldPosition);
+                            bool flag6 = voxelWorld.GetDensityAsFloat() >= __instance.IsoLevel && voxelWorld.Type != byte.MaxValue;
+                            if (flag6)
+                            {
+                                grid = grid3;
+                                break;
+                            }
+                        }
+                        attempts++;
+                    }
                 }
                 else
-                    yield return instructionList[i];
+                {
+                    bool flag7 = attempts < minVeinAttempts;
+                    if (!flag7)
+                    {
+                        break;
+                    }
+                }
             }
+            __result= chunks;
+            return false;
         }
     }
-    */
-
-
 }
