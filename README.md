@@ -13,9 +13,9 @@ Completed features
  - :heavy_check_mark: Lowered bedrock depth - default 4x deeper than vanilla (configurable)
  - :heavy_check_mark: No more lava/bedrock texture at unrealistic depths
  - :heavy_check_mark: Increasing ore yields the deeper you go
- - :heavy_check_mark: Faster drilling speeds
+ - :heavy_check_mark: Faster drilling speeds (configurable)
  - :heavy_check_mark: Doubled GPR (ground penetrating radar) scan radius (configurable)
- - :heavy_check_mark: Increased ore stack size to 100
+ - :heavy_check_mark: Increased ore stack size to 100 (configurable)
 
 Planned features
  - :small_orange_diamond: Increasing vein size/frequency at deeper depths (conversely, sparse veins at the surface)
