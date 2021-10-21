@@ -21,7 +21,7 @@ namespace DeepMineMod
 
         public static void ModLog(string text)
         {
-            UnityEngine.Debug.Log("[Deep Mine Mod] " + text);
+            UnityEngine.Debug.Log("[Deep Mine Mod]: " + text);
         }
 
         // Awake is called once when both the game and the plug-in are loaded
@@ -30,7 +30,7 @@ namespace DeepMineMod
             HandleConfig();
 
             ModLog("Successfully loaded Deep Mine Mod");
-            ModLog("Patching...");
+            ModLog("Attempting to patch");
             var harmony = new Harmony("com.dl.deepmine");
             harmony.PatchAll();
             ModLog("Patched");

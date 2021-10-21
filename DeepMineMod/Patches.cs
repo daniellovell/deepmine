@@ -54,10 +54,6 @@ namespace DeepMineMod
                 __instance.MinDropQuantity = 20;
                 __instance.MaxDropQuantity = 40;
             }
-            //Debug.Log("Position: " + position.y + "  new drop quantities: " + __instance.MinDropQuantity + " " + __instance.MaxDropQuantity);
-            //__instance.VeinSize = 
-            //__instance.VeinSize = Math.Min(10, Math.Max(0, __instance.VeinSize));
-            //Debug.Log(__instance.Position + __instance.DisplayName);
         }
     }
 
@@ -83,12 +79,11 @@ namespace DeepMineMod
         {
             Type typeBoxCollider = __instance.GameObject.GetComponent("BoxCollider").GetType();
             PropertyInfo prop = typeBoxCollider.GetProperty("size");
-            //prop.SetValue(__instance.GameObject.GetComponent("BoxCollider"), new Vector3(5, 5, 5), null);
         }
     }
 
     /// <summary>
-    /// Prevents lava bedrock texture from spawning
+    /// Prevents lava bedrock texture from spawning, potentially has insidious effect but unclear from initial tests
     /// </summary>
     [HarmonyPatch(typeof(TerrainGeneration), "SetUpChunk", new Type[] { typeof(ChunkObject) })]
     public class TerrainGeneration_SetUpChunk
@@ -112,8 +107,6 @@ namespace DeepMineMod
         static void Prefix(TerrainGeneration __instance)
         {
             WorldManager.BedrockLevel = DeepMinePlugin.BedrockDepth;
-            //WorldManager.SizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 2;
-            //WorldManager.HalfSizeOfWorld = -(int)DeepMinePlugin.BedrockDepth / 4;
             WorldManager.LavaLevel = DeepMinePlugin.BedrockDepth;
         }
     }
@@ -144,7 +137,7 @@ namespace DeepMineMod
     }
 
     /// <summary>
-    /// Increasing drill speed
+    /// Alter GPR Range
     /// </summary>
     [HarmonyPatch(typeof(PortableGPR), "Awake")]
     public class PortableGPR_Awake
