@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Assets.Scripts;
 using Assets.Scripts.Voxel;
 using HarmonyLib;
@@ -7,13 +6,9 @@ using HarmonyLib;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
 using Assets.Scripts.Objects.Items;
-using System.Reflection.Emit;
 using Assets.Scripts.GridSystem;
-using HarmonyLib.Tools;
-using Assets.Scripts.Objects;
 using Assets.Scripts.Objects.Electrical;
 
 namespace DeepMineMod
