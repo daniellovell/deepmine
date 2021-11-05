@@ -10,6 +10,7 @@ using UnityEngine;
 using Assets.Scripts.Objects.Items;
 using Assets.Scripts.GridSystem;
 using Assets.Scripts.Objects.Electrical;
+using Assets.Scripts.Objects;
 
 namespace DeepMineMod
 {
@@ -53,15 +54,18 @@ namespace DeepMineMod
     }
 
     /// <summary>
-    /// Alter ore drop quantities based on their world position
+    /// Alter ore max stack size
     /// </summary>
-    [HarmonyPatch(typeof(Ore), "Start")]
-    public class Ore_Start
+    [HarmonyPatch(typeof(Thing), "LoadPrefabs")]
+    public class Thing_LoadPrefabs
     {
-        static void Postfix(Ore __instance)
+        static void Postfix()
         {
-            __instance.MaxQuantity = DeepMinePlugin.OreStackSize;
+            foreach (var orePrefab in Ore.AllOrePrefabs) {
+                orePrefab.MaxQuantity = DeepMinePlugin.OreStackSize;
+            }
         }
+
     }
 
     /// <summary>

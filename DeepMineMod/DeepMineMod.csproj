@@ -28,6 +28,9 @@
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>Libs\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
+    <Reference Include="com.unity.multiplayer-hlapi.Runtime">
+      <HintPath>Libs\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
