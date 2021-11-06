@@ -19,7 +19,6 @@ Completed features
 
 Planned features
  - :small_orange_diamond: Increasing vein size/frequency at deeper depths (conversely, sparse veins at the surface)
- - :small_orange_diamond: Horizontal auto miner drilling
  - :small_orange_diamond: More mining drill tiers. Including tools with larger mining radius.
  - :small_orange_diamond: Threats and dangers below the surface. Gas pockets, and various pressure/temperature
 
