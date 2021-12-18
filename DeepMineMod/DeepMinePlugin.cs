@@ -1,6 +1,7 @@
-﻿using BepInEx;
-using HarmonyLib;
+﻿using Assets.Scripts.Voxel;
+using BepInEx;
 using BepInEx.Configuration;
+using HarmonyLib;
 using System;
 using UnityEngine;
 
@@ -23,10 +24,11 @@ namespace DeepMineMod
 
         public static float[] DepthCurve;
         public static float[] DistanceCurve;
+        public static Utils.WalkerMethod<Mineables>[] MineralDistributions;
 
         public static void ModLog(string text)
         {
-            UnityEngine.Debug.Log("[Deep Mine Mod] " + text);
+            Debug.Log("[Deep Mine Mod] " + text);
         }
 
         // Awake is called once when both the game and the plug-in are loaded
@@ -35,7 +37,10 @@ namespace DeepMineMod
             HandleConfig();
 
             ModLog("Successfully loaded Deep Mine Mod");
-            Logger.LogInfo("Precalculating distributuion curves");
+            ModLog("Precalculating distributuion curves");
+            PrecaluculateDistribution();
+            ModLog("Precalculating mineral distribution tables");
+            PrecaluculateMineralTables();
             ModLog("Patching...");
             var harmony = new Harmony("com.dl.deepmine");
             harmony.PatchAll();
@@ -46,7 +51,8 @@ namespace DeepMineMod
         {
             var maxDepth = (int)Math.Abs(BedrockDepth);
             var depthCurve = new float[maxDepth];
-            for (int i = 0; i < maxDepth; i++) {
+            for (int i = 0; i < maxDepth; i++)
+            {
                 depthCurve[i] = Utils.BezierInterp(0f, 1f, 10f, 25f, (float)i / maxDepth);
             }
 
@@ -58,6 +64,13 @@ namespace DeepMineMod
             }
             DepthCurve = depthCurve;
             DistanceCurve = distanceCurve;
+        }
+
+        public const int DISTRIBUTION_LEVELS = 4;
+        void PrecaluculateMineralTables()
+        {
+            // I can't actually precalculate this stuff because MiningManager.MineableTypes is populated later on
+            MineralDistributions = new Utils.WalkerMethod<Mineables>[DISTRIBUTION_LEVELS];
         }
 
         void HandleConfig()

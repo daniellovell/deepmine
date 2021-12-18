@@ -153,14 +153,47 @@ namespace DeepMineMod
             return (min, max);
         }
 
-        static Utils.WalkerMethod<Mineables> MineablesDistribution = null;
-        static Mineables GetRandomMineableType(System.Random random)
+        static Mineables GetRandomMineableType(System.Random random, float depth)
         {
-            if (MineablesDistribution == null) {
-                var mineables = MiningManager.MineableTypes.Values;
-                MineablesDistribution = Utils.WalkerMethod<Mineables>.Ctor(mineables, (m) => m.Rarity);
+            depth = Math.Abs(depth);
+            int depth_int;
+            if (depth > 30)
+            {
+                depth_int = 1;
             }
-            return MineablesDistribution.Random(random);
+            else if (depth > 60)
+            {
+                depth_int = 2;
+            }
+            else if (depth >= 90)
+            {
+                depth_int = 3;
+            }
+            else
+            {
+                depth_int = 0;
+            }
+            if (DeepMinePlugin.MineralDistributions[depth_int] == null)
+            {
+                DeepMinePlugin.ModLog("Calculating mineable distribution");
+                var mineables = MiningManager.MineableTypes.Values;
+                for (int i = 0; i < DeepMinePlugin.DISTRIBUTION_LEVELS; i++)
+                {
+                    Func<Mineables, float> getWeight = (m) =>
+                    {
+                        var rarity = m.Rarity;
+                        if (rarity < 25)
+                        {
+                            rarity *= i;
+                        }
+                        //DeepMinePlugin.ModLog($"{m.DisplayName}.Rarity: {rarity}");
+                        return rarity;
+                    };
+                    DeepMinePlugin.MineralDistributions[i] = Utils.WalkerMethod<Mineables>.Ctor(mineables, getWeight);
+                }
+            }
+
+            return DeepMinePlugin.MineralDistributions[depth_int].Random(random);
         }
 
         public static bool Prefix(Asteroid __instance, Vector4 localPosition, ref IReadOnlyCollection<ChunkObject> __result, Mineables mineable = null, HashSet<ChunkObject> chunks = null, int attempts = 0)
@@ -171,7 +204,7 @@ namespace DeepMineMod
                 chunks = __instance._chunks;
             }
             Grid3 grid = ((Vector3)localPosition).ToGridRaw();
-            mineable = (mineable ?? GetRandomMineableType(__instance._mineableRandom));
+            mineable = (mineable ?? GetRandomMineableType(__instance._mineableRandom, grid.y));
             var (minVeinAttempts, maxVeinAttempts) = CalculateMaxVeinAttempts(mineable, grid, __instance.Position);
             while (attempts < maxVeinAttempts)
             {

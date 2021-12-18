@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Assets.Scripts.Util;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.Util;
 
 namespace DeepMineMod
 {
-    class Utils
+    public class Utils
     {
         public static float BezierInterp(float p0, float p1, float p2, float p3, float t)
         {
