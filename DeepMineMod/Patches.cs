@@ -133,67 +133,64 @@ namespace DeepMineMod
     // VeinSize does not help really, its 0-1 and 1 is the maximum ore size
     // Best to alter VeinAttempts at lower locations
 
-
     [HarmonyPatch(typeof(Asteroid), "SetMineable", new Type[] { typeof(Vector4), typeof(Mineables), typeof(HashSet<ChunkObject>), typeof(int) })]
     public static class Asteroid_SetMineable
     {
-        public static float Lerp(float a, float b, float t)
-        {
-            return t * b + (1 - t) * a;
-        }
         static (int, int) CalculateMaxVeinAttempts(Mineables mineable, Grid3 worldGrid, Vector3 asteroidPosition)
-        {            
-           Vector3 worldPosition = worldGrid.ToVector3Raw() * ChunkObject.VoxelSize + asteroidPosition;
+        {
+            Vector3 worldPosition = worldGrid.ToVector3Raw() * ChunkObject.VoxelSize + asteroidPosition;
             var distanceFromSpawn = Vector3.Distance(worldPosition, new Vector3(0f, worldPosition.y, 0f));
             float depth = 0f - worldPosition.y;
             depth = depth > 0f ? depth : 0f;
-            float depthWeight = 1f;
-            float distanceWeight = 0.1f;
-            float multiplier = 1f + (Lerp(0f, 0.05f, depth) * depthWeight) + (Lerp(0f, 0.001f, distanceFromSpawn) * distanceWeight);
-            Debug.Log($"Pos: {worldPosition}, Depth: {depth}, Dist: {distanceFromSpawn}, mult: {multiplier}");
+            float depthWeight = 0.1f;
+            float distanceWeight = 0.01f;
+            float depthMult = Utils.BezierInterp(0f, 1f, 10f, 25f, Mathf.Pow(depth / Mathf.Abs(DeepMinePlugin.BedrockDepth), 2f));
+            float distanceMult = Utils.BezierInterp(0f, 0f, 25f, 25f, distanceFromSpawn / (1024f * 32f));
+            float multiplier = 1f + (depthMult * depthWeight) + (distanceMult * distanceWeight);
+            // Debug.Log($"Pos: {worldPosition}, Depth: {depth}, Dist: {distanceFromSpawn}, depth_mult: {depthMult}, dist_mult: {distanceMult}, total: {multiplier}");
             int min = (int)Math.Ceiling(mineable.MinVeinAttempts * multiplier);
             int max = (int)Math.Ceiling(mineable.MaxVeinAttempts * multiplier);
             return (min, max);
         }
 
-        public static bool Prefix(Asteroid __instance, Vector4 localPosition, ref IReadOnlyCollection<ChunkObject> __result,  Mineables mineable = null, HashSet<ChunkObject> chunks = null, int attempts = 0)
+        static Utils.WalkerMethod<Mineables> MineablesDistribution = null;
+        static Mineables GetRandomMineableType(System.Random random)
         {
-            bool flag = chunks == null;
-            if (flag)
+            if (MineablesDistribution == null) {
+                var mineables = MiningManager.MineableTypes.Values;
+                MineablesDistribution = Utils.WalkerMethod<Mineables>.Ctor(mineables, (m) => m.Rarity);
+            }
+            return MineablesDistribution.Random(random);
+        }
+
+        public static bool Prefix(Asteroid __instance, Vector4 localPosition, ref IReadOnlyCollection<ChunkObject> __result, Mineables mineable = null, HashSet<ChunkObject> chunks = null, int attempts = 0)
+        {
+            if (chunks == null)
             {
                 __instance._chunks.Clear();
                 chunks = __instance._chunks;
             }
             Grid3 grid = ((Vector3)localPosition).ToGridRaw();
-            mineable = (mineable ?? MiningManager.GenerateRandomMineableType(__instance._mineableRandom));
+            mineable = (mineable ?? GetRandomMineableType(__instance._mineableRandom));
             var (minVeinAttempts, maxVeinAttempts) = CalculateMaxVeinAttempts(mineable, grid, __instance.Position);
             while (attempts < maxVeinAttempts)
             {
                 attempts++;
-                bool flag2 = !VoxelGrid.IsPositionValid(grid, __instance.ChunkSize);
-                if (flag2)
+                if (!VoxelGrid.IsPositionValid(grid, __instance.ChunkSize))
                 {
                     Asteroid asteroid = __instance.ChunkController.GetChunk(__instance.LocalPosition + grid.ToVector3Raw()) as Asteroid;
-                    bool flag3 = asteroid == null;
-                    IReadOnlyCollection<ChunkObject> result;
-                    if (flag3)
-                    {
-                        result = chunks;
-                    }
-                    else
+                    if (asteroid != null)
                     {
                         grid.ModuloCorrect(__instance.ChunkSize);
                         asteroid.SetMineable(new Vector4((float)grid.x, (float)grid.y, (float)grid.z, localPosition.w), mineable, chunks, attempts);
-                        result = chunks;
                     }
-                    __result = result;
+                    __result = chunks;
                     return false;
                 }
                 chunks.Add(__instance);
                 __instance.SetVoxel((byte)mineable.VoxelType, 1f, (short)grid.x, (short)grid.y, (short)grid.z, true);
                 __instance.PopulateMineable(grid.ToVector3Raw(), mineable.VoxelType);
-                bool flag4 = __instance._mineableRandom.NextDouble() >= (double)(1f - mineable.VeinSize);
-                if (flag4)
+                if (__instance._mineableRandom.NextDouble() >= (double)(1f - mineable.VeinSize))
                 {
                     while (attempts < maxVeinAttempts)
                     {
@@ -208,12 +205,10 @@ namespace DeepMineMod
                         Grid3 grid3 = grid + grid2;
                         Vector3 worldPosition = __instance.LocalPosition + grid3.ToVector3Raw();
                         ChunkObject chunk = ChunkController.World.GetChunk(worldPosition);
-                        bool flag5 = chunk != null;
-                        if (flag5)
+                        if (chunk != null)
                         {
                             Voxel voxelWorld = __instance.ChunkController.GetVoxelWorld(worldPosition);
-                            bool flag6 = voxelWorld.GetDensityAsFloat() >= __instance.IsoLevel && voxelWorld.Type != byte.MaxValue;
-                            if (flag6)
+                            if (voxelWorld.GetDensityAsFloat() >= __instance.IsoLevel && voxelWorld.Type != byte.MaxValue)
                             {
                                 grid = grid3;
                                 break;
@@ -224,14 +219,11 @@ namespace DeepMineMod
                 }
                 else
                 {
-                    bool flag7 = attempts < minVeinAttempts;
-                    if (!flag7)
-                    {
+                    if (attempts >= minVeinAttempts)
                         break;
-                    }
                 }
             }
-            __result= chunks;
+            __result = chunks;
             return false;
         }
     }
