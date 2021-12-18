@@ -144,8 +144,8 @@ namespace DeepMineMod
             depth = depth > 0f ? depth : 0f;
             float depthWeight = 0.1f;
             float distanceWeight = 0.01f;
-            float depthMult = Utils.BezierInterp(0f, 1f, 10f, 25f, Mathf.Pow(depth / Mathf.Abs(DeepMinePlugin.BedrockDepth), 2f));
-            float distanceMult = Utils.BezierInterp(0f, 0f, 25f, 25f, distanceFromSpawn / (1024f * 32f));
+            float depthMult = DeepMinePlugin.DepthCurve[(int)depth];
+            float distanceMult = DeepMinePlugin.DistanceCurve[(int)distanceFromSpawn];
             float multiplier = 1f + (depthMult * depthWeight) + (distanceMult * distanceWeight);
             // Debug.Log($"Pos: {worldPosition}, Depth: {depth}, Dist: {distanceFromSpawn}, depth_mult: {depthMult}, dist_mult: {distanceMult}, total: {multiplier}");
             int min = (int)Math.Ceiling(mineable.MinVeinAttempts * multiplier);

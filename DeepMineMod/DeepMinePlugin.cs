@@ -1,6 +1,8 @@
 ﻿using BepInEx;
 using HarmonyLib;
 using BepInEx.Configuration;
+using System;
+using UnityEngine;
 
 namespace DeepMineMod
 {
@@ -19,6 +21,9 @@ namespace DeepMineMod
         public static float MineCompletionTime;
         public static float MineAmount;
 
+        public static float[] DepthCurve;
+        public static float[] DistanceCurve;
+
         public static void ModLog(string text)
         {
             UnityEngine.Debug.Log("[Deep Mine Mod] " + text);
@@ -30,10 +35,29 @@ namespace DeepMineMod
             HandleConfig();
 
             ModLog("Successfully loaded Deep Mine Mod");
+            Logger.LogInfo("Precalculating distributuion curves");
             ModLog("Patching...");
             var harmony = new Harmony("com.dl.deepmine");
             harmony.PatchAll();
             ModLog("Patched");
+        }
+
+        void PrecaluculateDistribution()
+        {
+            var maxDepth = (int)Math.Abs(BedrockDepth);
+            var depthCurve = new float[maxDepth];
+            for (int i = 0; i < maxDepth; i++) {
+                depthCurve[i] = Utils.BezierInterp(0f, 1f, 10f, 25f, (float)i / maxDepth);
+            }
+
+            var maxDistance = 1024 * 32;
+            var distanceCurve = new float[maxDistance];
+            for (int i = 0; i < maxDistance; i++)
+            {
+                distanceCurve[i] = Utils.BezierInterp(0f, 0f, 25f, 25f, i / (1024f * 32f)); ;
+            }
+            DepthCurve = depthCurve;
+            DistanceCurve = distanceCurve;
         }
 
         void HandleConfig()
