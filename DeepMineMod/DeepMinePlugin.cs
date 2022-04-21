@@ -62,14 +62,14 @@ namespace DeepMineMod
 
             configMineCompletionTime = Config.Bind("Mining Tool",   // The section under which the option is shown
                                      "MineCompletionTime",  // The key of the configuration option in the configuration file
-                                     0.05f, // The default value
+                                     0.12f, // The default value
                                      "Time to complete mining when using the tool. Smaller is faster drilling. Vanilla is 0.12"); // Description of the option to show in the config file
 
             MineCompletionTime = configMineCompletionTime.Value;
 
             configMineAmount = Config.Bind("Mining Tool",   // The section under which the option is shown 
                          "MineAmount",  // The key of the configuration option in the configuration file
-                         0.5f, // The default value
+                         0.3f, // The default value
                          "How much of the voxel to mine at a time. Larger is faster drilling. Vanilla is 0.2"); // Description of the option to show in the config file
 
             MineAmount = configMineAmount.Value;
