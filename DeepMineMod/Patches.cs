@@ -54,8 +54,8 @@ namespace DeepMineMod
     /// <summary>
     /// Alter ore max stack size
     /// </summary>
-    [HarmonyPatch(typeof(Prefab), "LoadAll")]
-    public class Prefab_LoadAll
+    [HarmonyPatch(typeof(Thing), "OnAllPrefabsLoaded")]
+    public class Thing_OnAllPrefabsLoaded
     {
         static void Postfix()
         {
