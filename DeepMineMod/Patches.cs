@@ -16,10 +16,10 @@ namespace DeepMineMod
     /// <summary>
     /// Alter ore drop quantities based on their world position
     /// </summary>
-    [HarmonyPatch(typeof(Mineables), MethodType.Constructor, new Type[] { typeof(Mineables), typeof(Vector3), typeof(Asteroid)})]
-    public class Mineables_Constructor
+    [HarmonyPatch(typeof(Minables), MethodType.Constructor, new Type[] { typeof(Minables), typeof(Vector3), typeof(Asteroid)})]
+    public class Minables_Constructor
     {
-        static void Postfix(Mineables __instance, Mineables masterInstance, Vector3 position, Asteroid parentAsteroid)
+        static void Postfix(Minables __instance, Minables masterInstance, Vector3 position, Asteroid parentAsteroid)
         {
 
             if(position.y > -10)
@@ -94,7 +94,7 @@ namespace DeepMineMod
     /// <summary>
     /// Increase the bedrock level
     /// </summary>
-    [HarmonyPatch(typeof(TerrainGeneration), "BuildAsteroidsStream", new Type[] { typeof(Vector3), typeof(int), typeof(int) })]
+    [HarmonyPatch(typeof(TerrainGeneration), "BuildAsteroidsStream", new Type[] { typeof(Vector3), typeof(int), typeof(int), typeof(bool) })]
     public class WorldManager_SetWorldEnvironments
     {
         static FieldInfo SizeOfWorld = AccessTools.Field(typeof(WorldManager), "SizeOfWorld");
